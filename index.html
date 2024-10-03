@@ -1,168 +1,152 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scanner Input</title>
-  <style>
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-    input {
-      width: 300px;
-      height: 30px;
-      font-size: 16px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scanner Item</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        #output {
+            margin-top: 20px;
+            background: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .item {
+            margin: 10px 0;
+        }
+    </style>
 </head>
 <body>
-  <h1>Scansione prodotti</h1>
+    <h1>Scanner Item</h1>
+    <div id="output"></div>
 
-  <label for="mezzoField">Mezzo:</label>
-  <input type="text" id="mezzoField" readonly>
-
-  <label for="batteriaField1">Batteria 1:</label>
-  <input type="text" id="batteriaField1" readonly>
-
-  <label for="batteriaField2">Batteria 2:</label>
-  <input type="text" id="batteriaField2" readonly>
-
-  <label for="corriereField">Corriere:</label>
-  <input type="text" id="corriereField" readonly>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      let inputBuffer = '';
-
-      // Lista dei codici "mezzo"
-      const mezzoCodes = [
-"[00000003282680]", "[00000003282674]", "[00000003282673]", "[00000003282641]",
-  "[00000003282716]", "[00000003282679]", "[00000003282675]", "[00000003282638]",
-  "[00000003282715]", "[00000003282672]", "[00000003282644]", "[00000003282637]",
-  "[00000003282980]", "[00000003282676]", "[00000003282643]", "[00000003282640]",
-  "[00000003282678]", "[00000003282677]", "[00000003282642]", "[00000003282636]",
-  "[00000003282708]", "[00000003282712]", "[00000003283000]", "[00000003282993]",
-  "[00000003283003]", "[00000003282934]", "[00000003282711]", "[00000003282959]",
-  "[00000003283008]", "[00000003282511]", "[00000003282709]", "[00000003282994]",
-  "[00000003282752]", "[00000003283001]", "[00000003282986]", "[00000003282957]",
-  "[00000003282960]", "[00000003282745]", "[00000003282916]", "[00000003282961]",
-  "[00000003282747]", "[00000003282710]", "[00000003282751]", "[00000003282979]",
-  "[00000003282978]", "[00000003282955]", "[00000003282914]", "[00000003282976]",
-  "[00000003283020]", "[00000003282746]", "[00000003282958]", "[00000003282750]",
-  "[00000003282744]", "[00000003282981]", "[00000003282935]", "[00000003282962]",
-  "[00000003282984]", "[00000003282913]", "[00000003282915]", "[00000003283002]",
-  "[00000003282749]", "[00000003282918]", "[00000003282983]", "[00000003282982]",
-  "[00000003282917]", "[00000003282956]", "[00000003282985]", "[00000003282987]",
-  "[00000003282748]", "[00000003282528]", "[00000003282499]", "[00000003282527]",
-  "[00000003282501]", "[00000003282500]", "[00000003282507]", "[00000003282462]",
-  "[00000003282461]", "[00000003282505]", "[00000003282506]", "[00000003282504]",
-  "[00000003282525]", "[00000003282502]", "[00000003282405]", "[00000003282503]",
-  "[00000003282404]", "[00000003282418]", "[00000003282421]", "[00000003282422]",
-  "[00000003282402]", "[00000003282424]", "[00000003282425]", "[00000003282423]",
-  "[00000003282398]", "[00000003282426]", "[00000003282403]", "[00000003282419]",
-  "[00000003282397]", "[00000003282420]", "[00000003282460]", "[00000003282399]",
-  "[00000003282400]", "[00000003282463]", "[00000003282464]", "[00000003282401]",
-  "[00000003282508]", "[00000003282524]", "[00000003282509]", "[00000003282523]",
-  "[00000003282510]", "[00000003282522]", "[00000003282977]", "[00000003282526]",
-  "[00000003282512]", "[00000003282521]", "[00000003282516]", "[00000003282520]",
-  "[00000003282713]", "[00000003282519]", "[00000003282714]", "[00000003282518]",
-  "[00000003282639]", "[00000003282517]"
-      ];
-
-      // Funzione per identificare il tipo di codice
-      function identifyCode(scannedCode) {
-        const cleanCode = scannedCode.trim();
-        
-        if (cleanCode.length === 14 && mezzoCodes.includes(cleanCode)) {
-          return 'mezzo';
-        } else if (cleanCode.length === 16 && cleanCode.startsWith('[') && cleanCode.endsWith(']')) {
-          return 'batteria';
-        } else if (cleanCode.match(/^\[.{1}\d{6}.{1}\]$/)) {
-          return 'corriere';
-        } else {
-          return 'unknown';
-        }
-      }
-
-      // Funzione per processare il codice scansionato
-      function processScannedCode(scannedCode) {
-        const codeType = identifyCode(scannedCode);
-        
-        switch (codeType) {
-          case 'mezzo':
-            document.getElementById('mezzoField').value = scannedCode;
-            break;
-          case 'batteria':
-            if (document.getElementById('batteriaField1').value === '') {
-              document.getElementById('batteriaField1').value = scannedCode;
-            } else {
-              document.getElementById('batteriaField2').value = scannedCode;
-            }
-            break;
-          case 'corriere':
-            document.getElementById('corriereField').value = scannedCode;
-            break;
-          default:
-            console.log('Codice sconosciuto:', scannedCode);
-        }
-
-        // Controlla se tutti i campi sono stati riempiti
-        if (
-          document.getElementById('mezzoField').value !== '' &&
-          document.getElementById('batteriaField1').value !== '' &&
-          document.getElementById('batteriaField2').value !== '' &&
-          document.getElementById('corriereField').value !== ''
-        ) {
-          sendToGoogleScript();  // Invia i dati all'App Script
-        }
-      }
-
-      // Ascoltatore di eventi per catturare l'input dello scanner
-      document.addEventListener('keydown', function(event) {
-        if (event.key === 'Enter') {
-          processScannedCode(inputBuffer);
-          inputBuffer = '';  // Resetta il buffer dopo il codice scansionato
-        } else {
-          inputBuffer += event.key;  // Aggiungi il carattere al buffer
-        }
-      });
-
-      // Funzione per inviare i dati a Google Apps Script
-      function sendToGoogleScript() {
-        const mezzo = document.getElementById('mezzoField').value;
-        const battery1 = document.getElementById('batteriaField1').value;
-        const battery2 = document.getElementById('batteriaField2').value;
-        const courier = document.getElementById('corriereField').value;
-
-        const data = {
-          vehicle: mezzo,
-          battery1: battery1,
-          battery2: battery2,
-          courier: courier,
+    <script>
+        let items = {
+            vehicle: [
+                "[00000003282680]", "[00000003282674]", "[00000003282673]", "[00000003282641]",
+                "[00000003282716]", "[00000003282679]", "[00000003282675]", "[00000003282638]",
+                "[00000003282715]", "[00000003282672]", "[00000003282644]", "[00000003282637]",
+                "[00000003282980]", "[00000003282676]", "[00000003282643]", "[00000003282640]",
+                "[00000003282678]", "[00000003282677]", "[00000003282642]", "[00000003282636]",
+                "[00000003282708]", "[00000003282712]", "[00000003283000]", "[00000003282993]",
+                "[00000003283003]", "[00000003282934]", "[00000003282711]", "[00000003282959]",
+                "[00000003283008]", "[00000003282511]", "[00000003282709]", "[00000003282994]",
+                "[00000003282752]", "[00000003283001]", "[00000003282986]", "[00000003282957]",
+                "[00000003282960]", "[00000003282745]", "[00000003282916]", "[00000003282961]",
+                "[00000003282747]", "[00000003282710]", "[00000003282751]", "[00000003282979]",
+                "[00000003282978]", "[00000003282955]", "[00000003282914]", "[00000003282976]",
+                "[00000003283020]", "[00000003282746]", "[00000003282958]", "[00000003282750]",
+                "[00000003282744]", "[00000003282981]", "[00000003282935]", "[00000003282962]",
+                "[00000003282984]", "[00000003282913]", "[00000003282915]", "[00000003283002]",
+                "[00000003282749]", "[00000003282918]", "[00000003282983]", "[00000003282982]",
+                "[00000003282917]", "[00000003282956]", "[00000003282985]", "[00000003282987]",
+                "[00000003282748]", "[00000003282528]", "[00000003282499]", "[00000003282527]",
+                "[00000003282501]", "[00000003282500]", "[00000003282507]", "[00000003282462]",
+                "[00000003282461]", "[00000003282505]", "[00000003282506]", "[00000003282504]",
+                "[00000003282525]", "[00000003282502]", "[00000003282405]", "[00000003282503]",
+                "[00000003282404]", "[00000003282418]", "[00000003282421]", "[00000003282422]",
+                "[00000003282402]", "[00000003282424]", "[00000003282425]", "[00000003282423]",
+                "[00000003282398]", "[00000003282426]", "[00000003282403]", "[00000003282419]",
+                "[00000003282397]", "[00000003282420]", "[00000003282460]", "[00000003282399]",
+                "[00000003282400]", "[00000003282463]", "[00000003282464]", "[00000003282401]",
+                "[00000003282508]", "[00000003282524]", "[00000003282509]", "[00000003282523]",
+                "[00000003282510]", "[00000003282522]", "[00000003282977]", "[00000003282526]",
+                "[00000003282512]", "[00000003282521]", "[00000003282516]", "[00000003282520]",
+                "[00000003282713]", "[00000003282519]", "[00000003282714]", "[00000003282518]",
+                "[00000003282639]", "[00000003282517]"
+            ],
+            battery: [],
+            courier: [],
+            batteryCount: 0,
+            vehicleCount: 0,
+            courierCount: 0
         };
 
-        fetch('https://script.google.com/a/macros/justeattakeaway.com/s/AKfycbyxK96tAADpyPiNjny5Y8FWPRVPGFoEg2cdrecIEMzrn9YJF1nYqCQ0hcRLad61DbT1/exec', {
-          method: 'POST',
-          body: JSON.stringify(data),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-        .then(response => response.json())
-        .then(data => {
-          console.log('Success:', data);
-          // Pulisce i campi dopo l'invio
-          document.getElementById('mezzoField').value = '';
-          document.getElementById('batteriaField1').value = '';
-          document.getElementById('batteriaField2').value = '';
-          document.getElementById('corriereField').value = '';
-        })
-        .catch(error => {
-          console.error('Error:', error);
+        document.addEventListener('click', function() {
+            let barcode = prompt("Scansiona il codice:"); // Mostra un prompt per scansionare il codice
+            if (barcode) {
+                handleScan(barcode);
+            }
         });
-      }
-    });
-  </script>
+
+        function handleScan(barcode) {
+            // Controlla se il codice scansionato è un veicolo
+            if (items.vehicle.includes(barcode)) {
+                items.vehicleCount++;
+                logItem("Mezzo", barcode);
+            } 
+            // Controlla se il codice scansionato è una batteria (16 caratteri)
+            else if (barcode.length === 16 && barcode.startsWith("[") && barcode.endsWith("]")) {
+                items.batteryCount++;
+                logItem("Batteria", barcode);
+            } 
+            // Controlla se il codice scansionato è un corriere
+            else if (barcode.length === 14 && barcode.startsWith("[") && barcode.endsWith("]")) {
+                items.courierCount++;
+                logItem("Corriere", barcode);
+            } else {
+                alert("Codice non valido.");
+            }
+
+            // Controlla se sono stati scansionati 4 item (2 batterie, 1 mezzo e 1 corriere)
+            if (items.batteryCount === 2 && items.vehicleCount === 1 && items.courierCount === 1) {
+                logData();
+            }
+        }
+
+        function logItem(type, barcode) {
+            const output = document.getElementById('output');
+            const itemDiv = document.createElement('div');
+            itemDiv.classList.add('item');
+            itemDiv.innerHTML = `<strong>${type}:</strong> ${barcode}`;
+            output.appendChild(itemDiv);
+        }
+
+        function logData() {
+            const data = {
+                battery1: items.battery[0], // Aggiungi qui logica per recuperare la prima batteria scansionata
+                battery2: items.battery[1], // Aggiungi qui logica per recuperare la seconda batteria scansionata
+                courier: items.courier[0], // Aggiungi qui logica per recuperare il corriere scansionato
+                vehicle: items.vehicle[0] // Aggiungi qui logica per recuperare il mezzo scansionato
+            };
+
+            // Invia i dati allo script di Google Apps
+            fetch('https://script.google.com/a/macros/justeattakeaway.com/s/AKfycbyxK96tAADpyPiNjny5Y8FWPRVPGFoEg2cdrecIEMzrn9YJF1nYqCQ0hcRLad61DbT1/exec', {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                alert("Dati loggati con successo!");
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert("Errore nel logging dei dati.");
+            });
+
+            // Resetta i contatori
+            resetCounts();
+        }
+
+        function resetCounts() {
+            items.batteryCount = 0;
+            items.vehicleCount = 0;
+            items.courierCount = 0;
+            items.battery = [];
+            items.courier = [];
+            items.vehicle = [];
+            document.getElementById('output').innerHTML = ''; // Pulisce l'output
+        }
+    </script>
 </body>
 </html>
