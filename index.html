@@ -1,6 +1,43 @@
-// Lista dei codici "mezzo"
-const mezzoCodes = [
-  "[00000003282680]", "[00000003282674]", "[00000003282673]", "[00000003282641]",
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scanner Input</title>
+  <style>
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input {
+      width: 300px;
+      height: 30px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Scansione prodotti</h1>
+
+  <label for="mezzoField">Mezzo:</label>
+  <input type="text" id="mezzoField" readonly>
+
+  <label for="batteriaField1">Batteria 1:</label>
+  <input type="text" id="batteriaField1" readonly>
+
+  <label for="batteriaField2">Batteria 2:</label>
+  <input type="text" id="batteriaField2" readonly>
+
+  <label for="corriereField">Corriere:</label>
+  <input type="text" id="corriereField" readonly>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      let inputBuffer = '';
+
+      // Lista dei codici "mezzo"
+      const mezzoCodes = [
+"[00000003282680]", "[00000003282674]", "[00000003282673]", "[00000003282641]",
   "[00000003282716]", "[00000003282679]", "[00000003282675]", "[00000003282638]",
   "[00000003282715]", "[00000003282672]", "[00000003282644]", "[00000003282637]",
   "[00000003282980]", "[00000003282676]", "[00000003282643]", "[00000003282640]",
@@ -31,89 +68,101 @@ const mezzoCodes = [
   "[00000003282512]", "[00000003282521]", "[00000003282516]", "[00000003282520]",
   "[00000003282713]", "[00000003282519]", "[00000003282714]", "[00000003282518]",
   "[00000003282639]", "[00000003282517]"
-];
+      ];
 
-// Funzione per identificare il tipo di codice
-function identifyCode(scannedCode) {
-  // Rimuovere spazi e controllare la lunghezza
-  const cleanCode = scannedCode.trim();
-  
-  if (cleanCode.length === 14 && mezzoCodes.includes(cleanCode)) {
-    return 'mezzo';
-  } else if (cleanCode.length === 16 && cleanCode.startsWith('[') && cleanCode.endsWith(']')) {
-    return 'batteria';
-  } else if (cleanCode.match(/^\[.{1}\d{6}.{1}\]$/)) {
-    return 'corriere';
-  } else {
-    return 'unknown';
-  }
-}
-
-// Esegui il log del risultato o popola i campi giusti
-function processScannedCode(scannedCode) {
-  const codeType = identifyCode(scannedCode);
-  
-  switch (codeType) {
-    case 'mezzo':
-      document.getElementById('mezzoField').value = scannedCode;
-      break;
-    case 'batteria':
-      if (document.getElementById('batteriaField1').value === '') {
-        document.getElementById('batteriaField1').value = scannedCode;
-      } else {
-        document.getElementById('batteriaField2').value = scannedCode;
+      // Funzione per identificare il tipo di codice
+      function identifyCode(scannedCode) {
+        const cleanCode = scannedCode.trim();
+        
+        if (cleanCode.length === 14 && mezzoCodes.includes(cleanCode)) {
+          return 'mezzo';
+        } else if (cleanCode.length === 16 && cleanCode.startsWith('[') && cleanCode.endsWith(']')) {
+          return 'batteria';
+        } else if (cleanCode.match(/^\[.{1}\d{6}.{1}\]$/)) {
+          return 'corriere';
+        } else {
+          return 'unknown';
+        }
       }
-      break;
-    case 'corriere':
-      document.getElementById('corriereField').value = scannedCode;
-      break;
-    default:
-      console.log('Codice sconosciuto:', scannedCode);
-  }
 
-  // Controllo se tutti i campi sono stati riempiti
-  if (
-    document.getElementById('mezzoField').value !== '' &&
-    document.getElementById('batteriaField1').value !== '' &&
-    document.getElementById('batteriaField2').value !== '' &&
-    document.getElementById('corriereField').value !== ''
-  ) {
-    // Invia i dati all'App Script per il logging
-    sendToGoogleScript();
-  }
-}
+      // Funzione per processare il codice scansionato
+      function processScannedCode(scannedCode) {
+        const codeType = identifyCode(scannedCode);
+        
+        switch (codeType) {
+          case 'mezzo':
+            document.getElementById('mezzoField').value = scannedCode;
+            break;
+          case 'batteria':
+            if (document.getElementById('batteriaField1').value === '') {
+              document.getElementById('batteriaField1').value = scannedCode;
+            } else {
+              document.getElementById('batteriaField2').value = scannedCode;
+            }
+            break;
+          case 'corriere':
+            document.getElementById('corriereField').value = scannedCode;
+            break;
+          default:
+            console.log('Codice sconosciuto:', scannedCode);
+        }
 
-// Funzione per inviare i dati all'App Script
-function sendToGoogleScript() {
-  const mezzo = document.getElementById('mezzoField').value;
-  const battery1 = document.getElementById('batteriaField1').value;
-  const battery2 = document.getElementById('batteriaField2').value;
-  const courier = document.getElementById('corriereField').value;
+        // Controlla se tutti i campi sono stati riempiti
+        if (
+          document.getElementById('mezzoField').value !== '' &&
+          document.getElementById('batteriaField1').value !== '' &&
+          document.getElementById('batteriaField2').value !== '' &&
+          document.getElementById('corriereField').value !== ''
+        ) {
+          sendToGoogleScript();  // Invia i dati all'App Script
+        }
+      }
 
-  const data = {
-    vehicle: mezzo,
-    battery1: battery1,
-    battery2: battery2,
-    courier: courier,
-  };
+      // Ascoltatore di eventi per catturare l'input dello scanner
+      document.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+          processScannedCode(inputBuffer);
+          inputBuffer = '';  // Resetta il buffer dopo il codice scansionato
+        } else {
+          inputBuffer += event.key;  // Aggiungi il carattere al buffer
+        }
+      });
 
-  fetch('https://script.google.com/a/macros/justeattakeaway.com/s/AKfycbyxK96tAADpyPiNjny5Y8FWPRVPGFoEg2cdrecIEMzrn9YJF1nYqCQ0hcRLad61DbT1/exec', {
-    method: 'POST',
-    body: JSON.stringify(data),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      console.log('Success:', data);
-      // Pulisci i campi dopo l'invio
-      document.getElementById('mezzoField').value = '';
-      document.getElementById('batteriaField1').value = '';
-      document.getElementById('batteriaField2').value = '';
-      document.getElementById('corriereField').value = '';
-    })
-    .catch((error) => {
-      console.error('Error:', error);
+      // Funzione per inviare i dati a Google Apps Script
+      function sendToGoogleScript() {
+        const mezzo = document.getElementById('mezzoField').value;
+        const battery1 = document.getElementById('batteriaField1').value;
+        const battery2 = document.getElementById('batteriaField2').value;
+        const courier = document.getElementById('corriereField').value;
+
+        const data = {
+          vehicle: mezzo,
+          battery1: battery1,
+          battery2: battery2,
+          courier: courier,
+        };
+
+        fetch('https://script.google.com/a/macros/justeattakeaway.com/s/AKfycbyxK96tAADpyPiNjny5Y8FWPRVPGFoEg2cdrecIEMzrn9YJF1nYqCQ0hcRLad61DbT1/exec', {
+          method: 'POST',
+          body: JSON.stringify(data),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Success:', data);
+          // Pulisce i campi dopo l'invio
+          document.getElementById('mezzoField').value = '';
+          document.getElementById('batteriaField1').value = '';
+          document.getElementById('batteriaField2').value = '';
+          document.getElementById('corriereField').value = '';
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+      }
     });
-}
+  </script>
+</body>
+</html>
