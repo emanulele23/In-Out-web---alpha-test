@@ -104,49 +104,21 @@
       batteria2: ''
     };
 
-    // Lista dei mezzi
-    const mezziList = [
-      "[00000003282680]", "[00000003282674]", "[00000003282673]", "[00000003282641]",
-      "[00000003282716]", "[00000003282679]", "[00000003282675]", "[00000003282638]",
-      "[00000003282715]", "[00000003282672]", "[00000003282644]", "[00000003282637]",
-      "[00000003282980]", "[00000003282676]", "[00000003282643]", "[00000003282640]",
-      "[00000003282678]", "[00000003282677]", "[00000003282642]", "[00000003282636]",
-      "[00000003282708]", "[00000003282712]", "[00000003283000]", "[00000003282993]",
-      "[00000003283003]", "[00000003282934]", "[00000003282711]", "[00000003282959]",
-      "[00000003283008]", "[00000003282511]", "[00000003282709]", "[00000003282994]",
-      "[00000003282752]", "[00000003283001]", "[00000003282986]", "[00000003282957]",
-      "[00000003282960]", "[00000003282745]", "[00000003282916]", "[00000003282961]",
-      "[00000003282747]", "[00000003282710]", "[00000003282751]", "[00000003282979]",
-      "[00000003282978]", "[00000003282955]", "[00000003282914]", "[00000003282976]",
-      "[00000003283020]", "[00000003282746]", "[00000003282958]", "[00000003282750]",
-      "[00000003282744]", "[00000003282981]", "[00000003282935]", "[00000003282962]",
-      "[00000003282984]", "[00000003282913]", "[00000003282915]", "[00000003283002]",
-      "[00000003282749]", "[00000003282918]", "[00000003282983]", "[00000003282982]",
-      "[00000003282917]", "[00000003282956]", "[00000003282985]", "[00000003282987]",
-      "[00000003282748]", "[00000003282528]", "[00000003282499]", "[00000003282527]",
-      "[00000003282501]", "[00000003282500]", "[00000003282507]", "[00000003282462]",
-      "[00000003282461]", "[00000003282505]", "[00000003282506]", "[00000003282504]",
-      "[00000003282525]", "[00000003282502]", "[00000003282405]", "[00000003282503]",
-      "[00000003282404]", "[00000003282418]", "[00000003282421]", "[00000003282422]",
-      "[00000003282402]", "[00000003282424]", "[00000003282425]", "[00000003282423]",
-      "[00000003282398]", "[00000003282426]", "[00000003282403]", "[00000003282419]",
-      "[00000003282397]", "[00000003282420]", "[00000003282460]", "[00000003282399]",
-      "[00000003282400]", "[00000003282463]", "[00000003282464]", "[00000003282401]",
-      "[00000003282508]", "[00000003282524]", "[00000003282509]", "[00000003282523]",
-      "[00000003282510]", "[00000003282522]", "[00000003282977]", "[00000003282526]",
-      "[00000003282512]", "[00000003282521]", "[00000003282516]", "[00000003282520]",
-      "[00000003282713]", "[00000003282519]", "[00000003282714]", "[00000003282518]",
-      "[00000003282639]", "[00000003282517]"
-    ];
+    const mezziList = [/* lista di mezzi qui */];
 
-    // Funzione per gestire l'input del codice
-    function handleScanInput(event) {
-      const barcode = event.target.value.trim();
-      event.target.value = '';
-      processScan(barcode);
+    document.addEventListener('click', function() {
+      document.getElementById('scanStatus').innerText = 'In attesa di scansioni...';
+      document.addEventListener('keydown', handleScan);
+    });
+
+    function handleScan(event) {
+      if (event.key === 'Enter') {
+        const barcode = event.target.value.trim();
+        event.target.value = '';
+        processScan(barcode);
+      }
     }
 
-    // Funzione per processare il codice scansionato
     function processScan(barcode) {
       const regexCorriere = /^\[[a-zA-Z0-9]{2}\d{6}[a-zA-Z0-9]{2}\]$/; // Corriere
       const regexMezzo = /^\[[0-9]{14}\]$/; // Mezzo e Batteria
@@ -169,70 +141,51 @@
           scansione.batteria2 = barcode;
           document.getElementById('scannedBatteria2').innerText = barcode;
           document.getElementById('scanStatus').innerText = `Batteria 2 scansionata: ${barcode}`;
+          document.getElementById('issueButton').style.display = 'block';
         } else {
-          alert("Massimo 2 batterie scansionate.");
+          alert("Hai già scansionato due batterie.");
         }
       } else {
-        alert("Codice non valido.");
+        alert("Codice non valido. Riprova.");
       }
-
-      // Mostra il pulsante di invio se ci sono dati scansionati
-      if (scansione.corriere || scansione.mezzo || scansione.batteria1 || scansione.batteria2) {
-        document.getElementById('issueButton').style.display = 'inline-block';
-      }
-
-      // Ritorna l'input in ascolto
-      focusOnScanner();
     }
 
-    // Funzione per inviare i dati
-    async function sendData() {
-      const responseElement = document.getElementById('response');
-      responseElement.innerText = 'Invio in corso...';
-
-      // Dati da inviare
-      const payload = {
-        corriere: scansione.corriere,
-        mezzo: scansione.mezzo,
-        batteria1: scansione.batteria1,
-        batteria2: scansione.batteria2
-      };
-
-      try {
-        const response = await fetch('https://script.google.com/a/macros/justeattakeaway.com/s/AKfycbyxK96tAADpyPiNjny5Y8FWPRVPGFoEg2cdrecIEMzrn9YJF1nYqCQ0hcRLad61DbT1/exec', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(payload)
-        });
-
+    function sendData() {
+      const requestBody = JSON.stringify(scansione);
+      document.getElementById('response').innerText = "Invio dati...";
+      
+      fetch('https://script.google.com/a/macros/justeattakeaway.com/s/AKfycbyxK96tAADpyPiNjny5Y8FWPRVPGFoEg2cdrecIEMzrn9YJF1nYqCQ0hcRLad61DbT1/exec', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: requestBody
+      })
+      .then(response => {
         if (!response.ok) {
-          throw new Error('Errore nella comunicazione con il server');
+          throw new Error('Errore nella risposta del server');
         }
-
-        const data = await response.json();
-        responseElement.innerText = 'Dati inviati con successo!';
-        console.log(data); // Opzionale: mostra la risposta del server
-      } catch (error) {
-        responseElement.innerText = 'Errore nell\'invio dei dati.';
-        console.error('Errore:', error);
-      }
+        return response.json();
+      })
+      .then(data => {
+        document.getElementById('response').innerText = "Dati inviati con successo!";
+        resetScansione();
+      })
+      .catch(error => {
+        document.getElementById('response').innerText = "Errore: " + error.message;
+      });
     }
 
-    // Funzione per mantenere l'input in ascolto
-    function focusOnScanner() {
-      const scannerInput = document.createElement('input');
-      scannerInput.type = 'text';
-      scannerInput.style.position = 'absolute';
-      scannerInput.style.left = '-9999px'; // Nascondi l'input
-      scannerInput.addEventListener('input', handleScanInput);
-      document.body.appendChild(scannerInput);
-      scannerInput.focus();
+    function resetScansione() {
+      scansione = { corriere: '', mezzo: '', batteria1: '', batteria2: '' };
+      document.getElementById('scannedCorriere').innerText = '---';
+      document.getElementById('scannedMezzo').innerText = '---';
+      document.getElementById('scannedBatteria1').innerText = '---';
+      document.getElementById('scannedBatteria2').innerText = '---';
+      document.getElementById('scanStatus').innerText = 'In attesa di scansioni...';
+      document.getElementById('issueButton').style.display = 'none';
+      document.getElementById('response').innerText = '';
     }
-
-    // Avvia l'ascolto al caricamento della pagina
-    window.onload = focusOnScanner;
   </script>
 </body>
 </html>
