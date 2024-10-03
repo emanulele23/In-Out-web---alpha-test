@@ -27,6 +27,7 @@
       align-items: center;
       justify-content: center;
       height: 80vh;
+      cursor: pointer; /* Cambia il cursore per indicare che è cliccabile */
     }
 
     #scanStatus {
@@ -81,7 +82,7 @@
     In/Out Web - alpha test v0.1
   </header>
 
-  <main>
+  <main onclick="scanRandomItem()">
     <div id="scanStatus">In attesa di scansioni...</div>
 
     <div id="scannedItems">
@@ -139,13 +140,24 @@
       "[00000003282639]", "[00000003282517]"
     ];
 
-    document.addEventListener('keydown', function(event) {
-      if (event.key === 'Enter') {
-        const barcode = event.target.value.trim();
-        event.target.value = '';
+    function scanRandomItem() {
+      const randomIndex = Math.floor(Math.random() * (mezziList.length + 2));
+      let barcode;
+
+      if (randomIndex < mezziList.length) {
+        // Scansiona un mezzo
+        barcode = mezziList[randomIndex];
+        processScan(barcode);
+      } else if (randomIndex === mezziList.length) {
+        // Scansiona un corriere
+        barcode = `[AB123456CD]`; // Esempio di codice corriere
+        processScan(barcode);
+      } else {
+        // Scansiona una batteria
+        barcode = `[${Math.random().toString(36).substr(2, 14).toUpperCase()}]`; // Esempio di codice batteria casuale
         processScan(barcode);
       }
-    });
+    }
 
     function processScan(barcode) {
       const regexCorriere = /^\[[a-zA-Z0-9]{2}\d{6}[a-zA-Z0-9]{2}\]$/; // Corriere
@@ -156,63 +168,45 @@
         scansione.corriere = barcode;
         document.getElementById('scannedCorriere').innerText = barcode;
         document.getElementById('scanStatus').innerText = `Corriere scansionato: ${barcode}`;
-      } else if (mezziList.includes(barcode)) {
-        scansione.mezzo = barcode;
-        document.getElementById('scannedMezzo').innerText = barcode;
-        document.getElementById('scanStatus').innerText = `Mezzo scansionato: ${barcode}`;
-      } else if (isBatteria(barcode)) {
-        if (!scansione.batteria1) {
-          scansione.batteria1 = barcode;
-          document.getElementById('scannedBatteria1').innerText = barcode;
-          document.getElementById('scanStatus').innerText = `Batteria 1 scansionata: ${barcode}`;
-        } else if (!scansione.batteria2) {
-          scansione.batteria2 = barcode;
-          document.getElementById('scannedBatteria2').innerText = barcode;
-          document.getElementById('scanStatus').innerText = `Batteria 2 scansionata: ${barcode}`;
-          document.getElementById('issueButton').style.display = 'block';
+      } else if (regexMezzo.test(barcode)) {
+        if (isBatteria(barcode)) {
+          if (!scansione.batteria1) {
+            scansione.batteria1 = barcode;
+            document.getElementById('scannedBatteria1').innerText = barcode;
+            document.getElementById('scanStatus').innerText = `Batteria 1 scansionata: ${barcode}`;
+          } else {
+            scansione.batteria2 = barcode;
+            document.getElementById('scannedBatteria2').innerText = barcode;
+            document.getElementById('scanStatus').innerText = `Batteria 2 scansionata: ${barcode}`;
+          }
         } else {
-          alert("Hai già scansionato due batterie.");
+          scansione.mezzo = barcode;
+          document.getElementById('scannedMezzo').innerText = barcode;
+          document.getElementById('scanStatus').innerText = `Mezzo scansionato: ${barcode}`;
         }
-      } else {
-        alert("Codice non valido. Riprova.");
       }
+
+      // Mostra il pulsante solo se tutte le scansioni sono complete
+      document.getElementById('issueButton').style.display = (scansione.corriere && scansione.mezzo && scansione.batteria1 && scansione.batteria2) ? 'block' : 'none';
     }
 
     function sendData() {
-      const requestBody = JSON.stringify(scansione);
-      document.getElementById('response').innerText = "Invio dati...";
-      
       fetch('https://script.google.com/a/macros/justeattakeaway.com/s/AKfycbyxK96tAADpyPiNjny5Y8FWPRVPGFoEg2cdrecIEMzrn9YJF1nYqCQ0hcRLad61DbT1/exec', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: requestBody
+        body: JSON.stringify(scansione)
       })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Errore nella risposta del server');
-        }
-        return response.json();
-      })
+      .then(response => response.json())
       .then(data => {
-        document.getElementById('response').innerText = "Dati inviati con successo!";
-        resetScansione();
+        document.getElementById('response').innerText = 'Dati inviati con successo!';
+        console.log(data);
       })
       .catch(error => {
-        document.getElementById('response').innerText = "Errore: " + error.message;
+        document.getElementById('response').innerText = 'Errore nell\'invio dei dati!';
+        console.error('Errore:', error);
       });
-    }
-
-    function resetScansione() {
-      scansione = { corriere: '', mezzo: '', batteria1: '', batteria2: '' };
-      document.getElementById('scannedCorriere').innerText = '---';
-      document.getElementById('scannedMezzo').innerText = '---';
-      document.getElementById('scannedBatteria1').innerText = '---';
-      document.getElementById('scannedBatteria2').innerText = '---';
-      document.getElementById('scanStatus').innerText = 'In attesa di scansioni...';
-      document.getElementById('issueButton').style.display = 'none';
-      document.getElementById('response').innerText = '';
     }
   </script>
 </body>
