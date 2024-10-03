@@ -81,7 +81,7 @@
     In/Out Web - alpha test v0.1
   </header>
 
-  <main onclick="focusOnScanner();">
+  <main>
     <div id="scanStatus">In attesa di scansioni...</div>
 
     <div id="scannedItems">
@@ -180,6 +180,9 @@
       if (scansione.corriere || scansione.mezzo || scansione.batteria1 || scansione.batteria2) {
         document.getElementById('issueButton').style.display = 'inline-block';
       }
+
+      // Ritorna l'input in ascolto
+      focusOnScanner();
     }
 
     // Funzione per inviare i dati
