@@ -47,8 +47,10 @@
 
         // Ascolta qualsiasi evento di tasto premuto
         document.addEventListener('keydown', function(event) {
+            console.log("Tasto premuto:", event.key);  // Logga ogni tasto premuto
             if (event.key === 'Enter') {
                 // Quando si preme 'Enter', processa il codice scansionato
+                console.log("Barcode completo scansionato:", scannedBarcode); // Logga il barcode completo
                 handleScan(scannedBarcode.trim());
                 scannedBarcode = ''; // Resetta la variabile per la prossima scansione
             } else {
@@ -60,6 +62,8 @@
         document.getElementById('logButton').addEventListener('click', logData);
 
         function handleScan(barcode) {
+            if (barcode === '') return; // Se non c'è un barcode, non fare nulla
+            
             // Mostra il codice scansionato a schermo
             logItem("Scansione", barcode);
 
@@ -74,12 +78,7 @@
                 items.courier = barcode;
             }
 
-            // Controlla se è necessario loggare i dati (per ora è commentato)
-            /*
-            if (items.batteryCount === 2 && items.vehicleCount === 1 && items.courierCount === 1) {
-                logData();
-            }
-            */
+            console.log("Stato attuale degli item:", items); // Logga lo stato attuale degli item
         }
 
         function logItem(type, barcode) {
