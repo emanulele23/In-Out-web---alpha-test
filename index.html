@@ -88,19 +88,16 @@
         const inputFields = document.querySelectorAll('.barcodeInput');
 
         inputFields.forEach((input, index) => {
-            input.addEventListener('keydown', function(event) {
-                if (event.key === 'Enter') {
-                    const barcode = input.value.trim();
+            input.addEventListener('input', function() {
+                const barcode = input.value.trim();
+                if (barcode.length > 0) {
                     handleScan(barcode);
-
-                    // Passa automaticamente al prossimo input dopo un breve timeout
-                    setTimeout(() => {
-                        if (index + 1 < inputFields.length) {
-                            inputFields[index + 1].focus(); // Passa alla prossima barra
-                        } else {
-                            input.blur(); // Se è l'ultimo campo, rimuove il focus
-                        }
-                    }, 100); // Timeout di 100 ms per assicurare che il valore venga scritto
+                    // Passa automaticamente al prossimo input
+                    if (index + 1 < inputFields.length) {
+                        inputFields[index + 1].focus(); // Passa alla prossima barra
+                    } else {
+                        input.blur(); // Se è l'ultimo campo, rimuove il focus
+                    }
                 }
             });
         });
@@ -120,13 +117,6 @@
                 items.courierCount++;
                 items.courier = barcode;
             }
-
-            // Controlla se è necessario loggare i dati (per ora è commentato)
-            /*
-            if (items.batteryCount === 2 && items.vehicleCount === 1 && items.courierCount === 1) {
-                logData();
-            }
-            */
         }
 
         function logItem(type, barcode) {
