@@ -25,11 +25,11 @@
             padding: 10px 15px;
             font-size: 16px;
         }
-        #barcodeInput {
+        .barcodeInput {
             width: 100%;
             padding: 10px;
             font-size: 16px;
-            margin-top: 20px;
+            margin-top: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
         }
@@ -37,9 +37,40 @@
 </head>
 <body>
     <h1>Scanner Item</h1>
-    
-    <!-- Campo input per il codice scansionato -->
-    <input type="text" id="barcodeInput" placeholder="Scansiona il codice qui" autofocus>
+
+    <!-- 30 input per la scansione -->
+    <div id="inputs">
+        <input type="text" class="barcodeInput" id="barcodeInput1" placeholder="Scansiona il codice qui" autofocus>
+        <input type="text" class="barcodeInput" id="barcodeInput2" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput3" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput4" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput5" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput6" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput7" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput8" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput9" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput10" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput11" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput12" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput13" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput14" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput15" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput16" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput17" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput18" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput19" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput20" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput21" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput22" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput23" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput24" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput25" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput26" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput27" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput28" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput29" placeholder="Scansiona il codice qui">
+        <input type="text" class="barcodeInput" id="barcodeInput30" placeholder="Scansiona il codice qui">
+    </div>
 
     <div id="output"></div>
     <button id="logButton">Logga Dati</button>
@@ -54,23 +85,24 @@
             courier: ''
         };
 
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                const barcode = getBarcodeFromScanner(); // Leggi il codice scansionato
-                handleScan(barcode);
-            }
+        const inputFields = document.querySelectorAll('.barcodeInput');
+
+        inputFields.forEach((input, index) => {
+            input.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    const barcode = input.value.trim();
+                    handleScan(barcode);
+                    if (index + 1 < inputFields.length) {
+                        inputFields[index + 1].focus(); // Passa alla prossima barra
+                    } else {
+                        input.blur(); // Se è l'ultimo campo, rimuove il focus
+                    }
+                    input.value = ''; // Pulisce il campo dopo la scansione
+                }
+            });
         });
 
         document.getElementById('logButton').addEventListener('click', logData);
-
-        function getBarcodeFromScanner() {
-            // Ottiene il valore dall'input del codice a barre
-            const input = document.getElementById('barcodeInput');
-            const barcode = input.value.trim();
-            input.value = ''; // Pulisce il campo input dopo la scansione
-            input.focus(); // Rifocalizza l'input per scansionare il prossimo codice
-            return barcode;
-        }
 
         function handleScan(barcode) {
             // Mostra il codice scansionato a schermo
@@ -152,8 +184,8 @@
         }
 
         function isCourier(barcode) {
-            // Verifica se il codice è per un corriere (formato con parentesi quadre)
-            return /^\[[\d]{14}\]$/.test(barcode);
+            // Verifica se il codice è per un corriere (es. 7 caratteri)
+            return /^[A-Z0-9]{7}$/.test(barcode);
         }
     </script>
 </body>
