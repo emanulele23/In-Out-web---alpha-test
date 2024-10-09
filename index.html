@@ -86,8 +86,8 @@
                     isProcessing = true; // Imposta il flag per indicare che stiamo elaborando
                     handleScan(barcode);
 
-                    // Controlla se l'ultimo carattere inserito è `]`
-                    if (barcode.endsWith(']')) {
+                    // Controlla se il codice è completo con le parentesi quadre
+                    if (barcode.startsWith('[') && barcode.endsWith(']')) {
                         // Passa automaticamente al prossimo input
                         if (index + 1 < inputFields.length) {
                             setTimeout(() => {
