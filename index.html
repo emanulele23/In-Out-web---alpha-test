@@ -96,8 +96,8 @@
                         const codes = barcode.split(']').map(code => code.trim()).filter(code => code.length > 0);
                         codes.forEach((code, i) => {
                             // Aggiungi il delimitatore `]` ai codici
-                            code = code + ']';
-                            handleScan(code); // Gestisci il codice scansionato
+                            const fullCode = code + ']';
+                            handleScan(fullCode); // Gestisci il codice scansionato
 
                             // Passa al campo successivo
                             const nextInputIndex = index + i + 1;
@@ -114,6 +114,7 @@
                         } else {
                             input.blur(); // Se è l'ultimo campo, rimuove il focus
                         }
+                        input.value = ''; // Resetta il campo di input corrente
                     }
                 }
             });
