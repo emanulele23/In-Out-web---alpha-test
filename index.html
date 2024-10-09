@@ -86,8 +86,8 @@
                     isProcessing = true; // Imposta il flag per indicare che stiamo elaborando
                     handleScan(barcode);
 
-                    // Controlla se il codice è completo con le parentesi quadre
-                    if (barcode.startsWith('[') && barcode.endsWith(']')) {
+                    // Controlla se il codice termina con ]
+                    if (barcode.endsWith(']')) {
                         // Passa automaticamente al prossimo input
                         if (index + 1 < inputFields.length) {
                             setTimeout(() => {
@@ -103,6 +103,14 @@
                     setTimeout(() => {
                         isProcessing = false;
                     }, 100);
+                }
+            });
+
+            input.addEventListener('keydown', function(event) {
+                // Se premi il tasto "Enter", sposta il focus al prossimo input
+                if (event.key === 'Enter' && index + 1 < inputFields.length) {
+                    event.preventDefault(); // Previene l'azione predefinita di Enter
+                    inputFields[index + 1].focus();
                 }
             });
         });
