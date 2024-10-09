@@ -72,23 +72,34 @@
 
     <script>
         const items = [];
+        let isProcessing = false; // Flag per indicare se stiamo elaborando un input
 
         const inputFields = document.querySelectorAll('.barcodeInput');
 
         inputFields.forEach((input, index) => {
             input.addEventListener('input', function() {
+                // Se stiamo già elaborando, esci dalla funzione
+                if (isProcessing) return;
+                
                 const barcode = input.value.trim();
                 if (barcode.length > 0) {
-                    // Aggiungi il codice scansionato all'output
+                    isProcessing = true; // Imposta il flag per indicare che stiamo elaborando
                     handleScan(barcode);
 
                     // Passa automaticamente al prossimo input
                     if (index + 1 < inputFields.length) {
-                        inputFields[index + 1].focus(); // Passa alla prossima barra
+                        setTimeout(() => {
+                            inputFields[index + 1].focus(); // Passa alla prossima barra
+                        }, 100); // Attendi un breve momento prima di spostare il focus
                     } else {
                         input.blur(); // Se è l'ultimo campo, rimuove il focus
                     }
                     input.value = ''; // Resetta il campo di input corrente
+
+                    // Ripristina il flag dopo un breve ritardo per consentire l'elaborazione
+                    setTimeout(() => {
+                        isProcessing = false;
+                    }, 100);
                 }
             });
         });
