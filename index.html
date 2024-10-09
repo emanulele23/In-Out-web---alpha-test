@@ -20,11 +20,6 @@
         .item {
             margin: 10px 0;
         }
-        button {
-            margin-top: 20px;
-            padding: 10px 15px;
-            font-size: 16px;
-        }
         .barcodeInput {
             width: 100%;
             padding: 10px;
@@ -76,14 +71,7 @@
     <button id="logButton">Logga Dati</button>
 
     <script>
-        let items = {
-            batteryCount: 0,
-            vehicleCount: 0,
-            courierCount: 0,
-            batteries: [],
-            vehicle: '',
-            courier: ''
-        };
+        const items = [];
 
         const inputFields = document.querySelectorAll('.barcodeInput');
 
@@ -91,31 +79,16 @@
             input.addEventListener('input', function() {
                 const barcode = input.value.trim();
                 if (barcode.length > 0) {
-                    // Controlla se l'input contiene "]" per la divisione
-                    if (barcode.includes(']')) {
-                        const codes = barcode.split(']').map(code => code.trim()).filter(code => code.length > 0);
-                        codes.forEach((code, i) => {
-                            // Aggiungi il delimitatore `]` ai codici
-                            const fullCode = code + ']';
-                            handleScan(fullCode); // Gestisci il codice scansionato
+                    // Aggiungi il codice scansionato all'output
+                    handleScan(barcode);
 
-                            // Passa al campo successivo
-                            const nextInputIndex = index + i + 1;
-                            if (nextInputIndex < inputFields.length) {
-                                inputFields[nextInputIndex].focus(); // Passa al prossimo campo
-                            }
-                        });
-                        input.value = ''; // Resetta il campo di input corrente
+                    // Passa automaticamente al prossimo input
+                    if (index + 1 < inputFields.length) {
+                        inputFields[index + 1].focus(); // Passa alla prossima barra
                     } else {
-                        handleScan(barcode);
-                        // Passa automaticamente al prossimo input
-                        if (index + 1 < inputFields.length) {
-                            inputFields[index + 1].focus(); // Passa alla prossima barra
-                        } else {
-                            input.blur(); // Se è l'ultimo campo, rimuove il focus
-                        }
-                        input.value = ''; // Resetta il campo di input corrente
+                        input.blur(); // Se è l'ultimo campo, rimuove il focus
                     }
+                    input.value = ''; // Resetta il campo di input corrente
                 }
             });
         });
@@ -124,33 +97,22 @@
 
         function handleScan(barcode) {
             // Mostra il codice scansionato a schermo
-            logItem("Scansione", barcode);
-            if (isBattery(barcode)) {
-                items.batteryCount++;
-                items.batteries.push(barcode);
-            } else if (isVehicle(barcode)) {
-                items.vehicleCount++;
-                items.vehicle = barcode;
-            } else if (isCourier(barcode)) {
-                items.courierCount++;
-                items.courier = barcode;
-            }
+            logItem(barcode);
+            // Aggiungi il codice alla lista senza categorizzazione
+            items.push(barcode);
         }
 
-        function logItem(type, barcode) {
+        function logItem(barcode) {
             const output = document.getElementById('output');
             const itemDiv = document.createElement('div');
             itemDiv.classList.add('item');
-            itemDiv.innerHTML = `<strong>${type}:</strong> ${barcode}`;
+            itemDiv.innerHTML = barcode;
             output.appendChild(itemDiv);
         }
 
         function logData() {
             const data = {
-                battery1: items.batteries[0] || '',
-                battery2: items.batteries[1] || '',
-                courier: items.courier || '',
-                vehicle: items.vehicle || '',
+                items: items,
                 timestamp: new Date().toISOString() // Aggiunge la data e ora attuale
             };
 
@@ -166,7 +128,7 @@
             .then(data => {
                 console.log('Success:', data);
                 alert("Dati loggati con successo!");
-                resetCounts(); // Resetta i contatori dopo il logging
+                resetData(); // Resetta i dati dopo il logging
             })
             .catch((error) => {
                 console.error('Error:', error);
@@ -174,28 +136,11 @@
             });
         }
 
-        function resetCounts() {
-            items.batteryCount = 0;
-            items.vehicleCount = 0;
-            items.courierCount = 0;
-            items.batteries = [];
-            items.vehicle = '';
-            items.courier = '';
+        function resetData() {
+            items.length = 0; // Resetta l'array degli items
             document.getElementById('output').innerHTML = ''; // Pulisce l'output
             inputFields.forEach(input => input.value = ''); // Resetta i campi di input
             inputFields[0].focus(); // Riporta il focus al primo input
-        }
-
-        function isBattery(code) {
-            return code.startsWith('[') && code.endsWith(']') && code.length === 16; // Codice batterie
-        }
-
-        function isVehicle(code) {
-            return code.startsWith('[') && code.endsWith(']') && code.length === 14; // Codice veicolo
-        }
-
-        function isCourier(code) {
-            return code.startsWith('[') && code.endsWith(']') && code.length === 14; // Codice corriere
         }
     </script>
 </body>
