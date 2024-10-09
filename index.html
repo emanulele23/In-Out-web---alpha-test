@@ -10,24 +10,15 @@
             padding: 20px;
             background-color: #f0f0f0;
         }
-        #blocks {
+        #output {
             margin-top: 20px;
+            background: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         .item {
             margin: 10px 0;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            background-color: #e0e0e0;
         }
         button {
             margin-top: 20px;
@@ -39,13 +30,7 @@
 <body>
     <h1>Scanner Item</h1>
     
-    <div id="blocks">
-        <input type="text" class="item" id="block1" readonly />
-        <input type="text" class="item" id="block2" readonly />
-        <input type="text" class="item" id="block3" readonly />
-        <input type="text" class="item" id="block4" readonly />
-    </div>
-
+    <div id="output"></div>
     <button id="logButton">Logga Dati</button>
 
     <script>
@@ -59,7 +44,6 @@
         };
 
         let scannedBarcode = ''; // Variabile temporanea per memorizzare la scansione
-        let currentBlock = 1; // Indica il blocco attuale dove scrivere
 
         // Ascolta qualsiasi evento di tasto premuto
         document.addEventListener('keydown', function(event) {
@@ -67,7 +51,6 @@
                 // Quando si preme 'Enter', processa il codice scansionato
                 handleScan(scannedBarcode.trim());
                 scannedBarcode = ''; // Resetta la variabile per la prossima scansione
-                focusNextBlock(); // Passa al prossimo blocco
             } else {
                 // Aggiunge i caratteri alla variabile 'scannedBarcode'
                 scannedBarcode += event.key;
@@ -77,9 +60,8 @@
         document.getElementById('logButton').addEventListener('click', logData);
 
         function handleScan(barcode) {
-            // Mostra il codice scansionato nel blocco attuale
-            const currentBlockInput = document.getElementById(`block${currentBlock}`);
-            currentBlockInput.value = barcode;
+            // Mostra il codice scansionato a schermo
+            logItem("Scansione", barcode);
 
             if (isBattery(barcode)) {
                 items.batteryCount++;
@@ -98,6 +80,14 @@
                 logData();
             }
             */
+        }
+
+        function logItem(type, barcode) {
+            const output = document.getElementById('output');
+            const itemDiv = document.createElement('div');
+            itemDiv.classList.add('item');
+            itemDiv.innerHTML = `<strong>${type}:</strong> ${barcode}`;
+            output.appendChild(itemDiv);
         }
 
         function logData() {
@@ -136,16 +126,7 @@
             items.batteries = [];
             items.vehicle = '';
             items.courier = '';
-            document.querySelectorAll('.item').forEach(block => block.value = ''); // Pulisce i blocchi
-            currentBlock = 1; // Reset al primo blocco
-        }
-
-        function focusNextBlock() {
-            if (currentBlock < 4) {
-                currentBlock++; // Passa al blocco successivo
-            } else {
-                alert('Tutti i blocchi sono stati riempiti.');
-            }
+            document.getElementById('output').innerHTML = ''; // Pulisce l'output
         }
 
         function isBattery(barcode) {
