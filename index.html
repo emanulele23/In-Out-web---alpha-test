@@ -25,22 +25,11 @@
             padding: 10px 15px;
             font-size: 16px;
         }
-        #barcodeInput {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            margin-top: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
     </style>
 </head>
 <body>
     <h1>Scanner Item</h1>
     
-    <!-- Campo input per il codice scansionato -->
-    <input type="text" id="barcodeInput" placeholder="Scansiona il codice qui" autofocus>
-
     <div id="output"></div>
     <button id="logButton">Logga Dati</button>
 
@@ -54,27 +43,26 @@
             courier: ''
         };
 
+        let scannedBarcode = ''; // Variabile temporanea per memorizzare la scansione
+
+        // Ascolta qualsiasi evento di tasto premuto
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Enter') {
-                const barcode = getBarcodeFromScanner(); // Leggi il codice scansionato
-                handleScan(barcode);
+                // Quando si preme 'Enter', processa il codice scansionato
+                handleScan(scannedBarcode.trim());
+                scannedBarcode = ''; // Resetta la variabile per la prossima scansione
+            } else {
+                // Aggiunge i caratteri alla variabile 'scannedBarcode'
+                scannedBarcode += event.key;
             }
         });
 
         document.getElementById('logButton').addEventListener('click', logData);
 
-        function getBarcodeFromScanner() {
-            // Ottiene il valore dall'input del codice a barre
-            const input = document.getElementById('barcodeInput');
-            const barcode = input.value.trim();
-            input.value = ''; // Pulisce il campo input dopo la scansione
-            input.focus(); // Rifocalizza l'input per scansionare il prossimo codice
-            return barcode;
-        }
-
         function handleScan(barcode) {
             // Mostra il codice scansionato a schermo
             logItem("Scansione", barcode);
+
             if (isBattery(barcode)) {
                 items.batteryCount++;
                 items.batteries.push(barcode);
