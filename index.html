@@ -3,156 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scanner Item</title>
+    <title>Scanner Log</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background-color: #f0f0f0;
-        }
-        #output {
-            margin-top: 20px;
-            background: #fff;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .item {
-            margin: 10px 0;
-        }
-        .barcodeInput {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            margin-top: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #log { margin-top: 20px; }
     </style>
 </head>
 <body>
-    <h1>Scanner Item</h1>
-
-    <!-- 30 input per la scansione -->
-    <div id="inputs">
-        <input type="text" class="barcodeInput" id="barcodeInput1" placeholder="Scansiona il codice qui" autofocus>
-        <input type="text" class="barcodeInput" id="barcodeInput2" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput3" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput4" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput5" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput6" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput7" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput8" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput9" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput10" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput11" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput12" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput13" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput14" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput15" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput16" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput17" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput18" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput19" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput20" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput21" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput22" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput23" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput24" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput25" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput26" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput27" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput28" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput29" placeholder="Scansiona il codice qui">
-        <input type="text" class="barcodeInput" id="barcodeInput30" placeholder="Scansiona il codice qui">
-    </div>
-
-    <div id="output"></div>
-    <button id="logButton">Logga Dati</button>
+    <h1>Registrazione Codici a Barre</h1>
+    <p>Scansiona i codici a barre e premi il pulsante per registrare nel log.</p>
+    <div id="log"></div>
+    <button id="logButton">Registra nel Log</button>
 
     <script>
-        const items = [];
+        let scannedCodes = [];
 
-        const inputFields = document.querySelectorAll('.barcodeInput');
-
-        inputFields.forEach((input, index) => {
-            input.addEventListener('input', function() {
-                const barcode = input.value.trim();
-                if (barcode.length > 0) {
-                    handleScan(barcode);
-
-                    // Controlla se il codice termina con ]
-                    if (barcode.endsWith(']')) {
-                        // Passa automaticamente al prossimo input
-                        if (index + 1 < inputFields.length) {
-                            inputFields[index + 1].focus(); // Passa alla prossima barra
-                        } else {
-                            input.blur(); // Se è l'ultimo campo, rimuove il focus
-                        }
-                        // Resetta il campo di input corrente
-                        input.value = ''; 
-                    }
-                }
-            });
-
-            input.addEventListener('keydown', function(event) {
-                // Se premi il tasto "Enter", sposta il focus al prossimo input
-                if (event.key === 'Enter' && index + 1 < inputFields.length) {
-                    event.preventDefault(); // Previene l'azione predefinita di Enter
-                    inputFields[index + 1].focus();
-                }
-            });
+        // Funzione per gestire gli scan dei codici a barre
+        document.addEventListener('keypress', function(event) {
+            const code = event.key;
+            // Controlla se il codice inizia e finisce con '[' e ']'
+            if (code.startsWith('[') && code.endsWith(']')) {
+                scannedCodes.push(code);
+                displayCodes();
+            }
         });
 
-        document.getElementById('logButton').addEventListener('click', logData);
-
-        function handleScan(barcode) {
-            // Mostra il codice scansionato a schermo
-            logItem(barcode);
-            // Aggiungi il codice alla lista senza categorizzazione
-            items.push(barcode);
+        // Funzione per visualizzare i codici scansionati
+        function displayCodes() {
+            const logDiv = document.getElementById('log');
+            logDiv.innerHTML = '<strong>Codici Scansionati:</strong><br>' + scannedCodes.join('<br>');
         }
 
-        function logItem(barcode) {
-            const output = document.getElementById('output');
-            const itemDiv = document.createElement('div');
-            itemDiv.classList.add('item');
-            itemDiv.innerHTML = barcode;
-            output.appendChild(itemDiv);
-        }
-
-        function logData() {
-            const data = {
-                items: items,
-                timestamp: new Date().toISOString() // Aggiunge la data e ora attuale
-            };
-
-            // Invia i dati allo script di Google Apps
-            fetch('https://script.google.com/a/macros/justeattakeaway.com/s/AKfycbyxK96tAADpyPiNjny5Y8FWPRVPGFoEg2cdrecIEMzrn9YJF1nYqCQ0hcRLad61DbT1/exec', {
-                method: 'POST',
-                body: JSON.stringify(data),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                alert("Dati loggati con successo!");
-                resetData(); // Resetta i dati dopo il logging
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                alert("Errore nel logging dei dati.");
-            });
-        }
-
-        function resetData() {
-            items.length = 0; // Resetta l'array degli items
-            document.getElementById('output').innerHTML = ''; // Pulisce l'output
-            inputFields.forEach(input => input.value = ''); // Resetta i campi di input
-            inputFields[0].focus(); // Riporta il focus al primo input
-        }
+        // Funzione per inviare i dati a Google Sheets
+        document.getElementById('logButton').addEventListener('click', function() {
+            if (scannedCodes.length > 0) {
+                fetch('YOUR_WEBHOOK_URL', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ codes: scannedCodes })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Dati inviati con successo!');
+                        scannedCodes = []; // Resetta l'array dopo l'invio
+                        displayCodes();
+                    } else {
+                        alert('Errore nell\'invio dei dati.');
+                    }
+                })
+                .catch(error => {
+                    alert('Errore: ' + error);
+                });
+            } else {
+                alert('Nessun codice da registrare.');
+            }
+        });
     </script>
 </body>
 </html>
