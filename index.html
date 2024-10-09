@@ -17,14 +17,23 @@
 
     <script>
         let scannedCodes = [];
+        let currentCode = '';
 
         // Funzione per gestire gli scan dei codici a barre
-        document.addEventListener('keypress', function(event) {
-            const code = event.key;
-            // Controlla se il codice inizia e finisce con '[' e ']'
-            if (code.startsWith('[') && code.endsWith(']')) {
-                scannedCodes.push(code);
-                displayCodes();
+        document.addEventListener('keydown', function(event) {
+            const key = event.key;
+
+            // Controlla se è stato premuto 'Enter' (fine del codice scansionato)
+            if (key === 'Enter') {
+                // Aggiungi il codice corrente all'array se inizia e finisce con '[' e ']'
+                if (currentCode.startsWith('[') && currentCode.endsWith(']')) {
+                    scannedCodes.push(currentCode);
+                    displayCodes();
+                }
+                currentCode = ''; // Resetta il codice corrente
+            } else {
+                // Accumula i caratteri finché non viene premuto 'Enter'
+                currentCode += key;
             }
         });
 
