@@ -25,10 +25,22 @@
             padding: 10px 15px;
             font-size: 16px;
         }
+        #barcodeInput {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
     <h1>Scanner Item</h1>
+    
+    <!-- Campo input per il codice scansionato -->
+    <input type="text" id="barcodeInput" placeholder="Scansiona il codice qui" autofocus>
+
     <div id="output"></div>
     <button id="logButton">Logga Dati</button>
 
@@ -52,11 +64,11 @@
         document.getElementById('logButton').addEventListener('click', logData);
 
         function getBarcodeFromScanner() {
-            // Qui dovresti implementare la logica per ricevere il codice dallo scanner.
-            // Per ora, assumiamo che il codice venga passato dall'input della tastiera.
+            // Ottiene il valore dall'input del codice a barre
             const input = document.getElementById('barcodeInput');
             const barcode = input.value.trim();
             input.value = ''; // Pulisce il campo input dopo la scansione
+            input.focus(); // Rifocalizza l'input per scansionare il prossimo codice
             return barcode;
         }
 
