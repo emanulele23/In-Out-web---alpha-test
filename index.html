@@ -92,12 +92,15 @@
                 if (event.key === 'Enter') {
                     const barcode = input.value.trim();
                     handleScan(barcode);
-                    if (index + 1 < inputFields.length) {
-                        inputFields[index + 1].focus(); // Passa alla prossima barra
-                    } else {
-                        input.blur(); // Se è l'ultimo campo, rimuove il focus
-                    }
-                    input.value = ''; // Pulisce il campo dopo la scansione
+
+                    // Passa automaticamente al prossimo input dopo un breve timeout
+                    setTimeout(() => {
+                        if (index + 1 < inputFields.length) {
+                            inputFields[index + 1].focus(); // Passa alla prossima barra
+                        } else {
+                            input.blur(); // Se è l'ultimo campo, rimuove il focus
+                        }
+                    }, 100); // Timeout di 100 ms per assicurare che il valore venga scritto
                 }
             });
         });
@@ -170,22 +173,18 @@
             items.batteries = [];
             items.vehicle = '';
             items.courier = '';
-            document.getElementById('output').innerHTML = ''; // Pulisce l'output
         }
 
         function isBattery(barcode) {
-            // Verifica se il codice è per una batteria (16 caratteri con parentesi quadre)
-            return /^[\[\d]{16}\]$/.test(barcode);
+            return /^[A-Z0-9]{16}$/.test(barcode); // Esempio per una batteria (16 caratteri)
         }
 
         function isVehicle(barcode) {
-            // Verifica se il codice è per un veicolo (14 caratteri)
-            return /^[A-Z0-9]{14}$/.test(barcode);
+            return /^[A-Z0-9]{14}$/.test(barcode); // Esempio per un veicolo (14 caratteri)
         }
 
         function isCourier(barcode) {
-            // Verifica se il codice è per un corriere (es. 7 caratteri)
-            return /^[A-Z0-9]{7}$/.test(barcode);
+            return /^[A-Z0-9]{7}$/.test(barcode); // Esempio per un corriere (7 caratteri)
         }
     </script>
 </body>
