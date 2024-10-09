@@ -10,22 +10,24 @@
             padding: 20px;
             background-color: #f0f0f0;
         }
-        #output {
+        #blocks {
             margin-top: 20px;
-            background: #fff;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         .item {
             margin: 10px 0;
             padding: 10px;
-            background-color: #e0e0e0;
-            min-height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
             border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background-color: #e0e0e0;
         }
         button {
             margin-top: 20px;
@@ -38,10 +40,10 @@
     <h1>Scanner Item</h1>
     
     <div id="blocks">
-        <div class="item" id="block1"></div>
-        <div class="item" id="block2"></div>
-        <div class="item" id="block3"></div>
-        <div class="item" id="block4"></div>
+        <input type="text" class="item" id="block1" readonly />
+        <input type="text" class="item" id="block2" readonly />
+        <input type="text" class="item" id="block3" readonly />
+        <input type="text" class="item" id="block4" readonly />
     </div>
 
     <button id="logButton">Logga Dati</button>
@@ -76,8 +78,8 @@
 
         function handleScan(barcode) {
             // Mostra il codice scansionato nel blocco attuale
-            const currentBlockDiv = document.getElementById(`block${currentBlock}`);
-            currentBlockDiv.innerHTML = barcode;
+            const currentBlockInput = document.getElementById(`block${currentBlock}`);
+            currentBlockInput.value = barcode;
 
             if (isBattery(barcode)) {
                 items.batteryCount++;
@@ -134,7 +136,7 @@
             items.batteries = [];
             items.vehicle = '';
             items.courier = '';
-            document.querySelectorAll('.item').forEach(block => block.innerHTML = ''); // Pulisce i blocchi
+            document.querySelectorAll('.item').forEach(block => block.value = ''); // Pulisce i blocchi
             currentBlock = 1; // Reset al primo blocco
         }
 
